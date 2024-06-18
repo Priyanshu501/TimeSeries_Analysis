@@ -39,23 +39,23 @@ st.write('''
          
          * **Volume:** The number of shares traded on that day.
 ''')
-view_dataset = st.expander("View Dataset")
-view_dataset.dataframe(df, use_container_width=True)
+
+st.dataframe(df, use_container_width=True)
 
 # Statistical Description
 st.header('Statistical Overview')
 st.write(stock_data.describe())
-statistical_observations = st.expander("See Explanation")
-statistical_observations.subheader('Key Oberservations: Open, High, Low, Close')
-statistical_observations.write('''
+
+st.write('Key Oberservations: (Open, High, Low, Close)')
+st.write('''
          * Average closely falls around 126 to 128.\
          
          * Standard Deviation is around 50 to 51. Indicating consistent fluctuations in the stock's price throughout the trading day.\
          
          * Highest recorded price is 291.5 and Lowest price is 55.0. Indicating High Variability in prices.
          ''')
-statistical_observations.subheader('Key Observations: Volume')
-statistical_observations.write('''
+st.write('Key Observations: (Volume)')
+st.write('''
          * Average Trading Volume is approximately 59.5 million shares.\
          
          * Standard Deviation if 46.8 million.\
@@ -73,21 +73,19 @@ st.header('Visualizations')
 st.subheader('Line Plots and Histograms')
 st.plotly_chart(density_plot, use_container_width=True)
 
-histogram_observations = st.expander('See Interpretation')
-histogram_observations.write('''
-                             Observations:\
-                             
-                             * Distribution is right-skewed with a long tail towards higher prices, this indicates positive price changes are more frequent.\
-                             
-                             * There is significant variability in the closing prices over the time period.
+st.write('''
+        Observations:\
+        
+        * Distribution is right-skewed with a long tail towards higher prices, this indicates positive price changes are more frequent.\
+        
+        * There is significant variability in the closing prices over the time period.
 ''')
 
 # Stock Data Overview
 st.subheader('Observations from Line Plots' )
 st.plotly_chart(line_plots, use_container_width=True)
 
-stock_data_obs = st.expander('See Interpretation')
-stock_data_obs.write('''
+st.write('''
                      Interpretations:\
                      
                      * Overall strong consistently upward trend. Indicating overall growth and Increasing value over the period.\
@@ -99,8 +97,7 @@ stock_data_obs.write('''
 
 st.plotly_chart(line_plots2, use_container_width=True)
 
-stock_data_obs2 = st.expander('See Interpretation')
-stock_data_obs2.write('''
+st.write('''
                       Interpretations:\
                       
                       * **Volatility**: The 2012-2013 period was marked by higher volatility compared to 2016-2017.
@@ -112,8 +109,7 @@ stock_data_obs2.write('''
 st.plotly_chart(pct_change, use_container_width=True)
 st.plotly_chart(kde_plot, use_container_width=True)
 
-per_change = st.expander('See Interpretation')
-per_change.write('''
+st.write('''
                  Interpretations:\
                  
                  * It indicates daily fluctuations in stock prices.\
@@ -133,8 +129,7 @@ per_change.write('''
 st.subheader('Volume Traded over Time')
 st.plotly_chart(volume_plot, use_container_width=True)
 
-volume_obs = st.expander("See Interpretation")
-volume_obs.write('''
+st.write('''
                  Interpretations:\
                  
                  * Range of Volume from 11.3M to 376.5M.\
@@ -147,8 +142,8 @@ volume_obs.write('''
 ''')
 
 st.plotly_chart(volume_correlation, use_container_width=True)
-volume_correlation_obs = st.expander("See Interpretation")
-volume_correlation_obs.write('''
+
+st.write('''
                              Interpretations:\
                              
                              * Negative Correlation: As trading volume increases, the closing price tends to decrease, suggesting selling pressure.\
@@ -160,8 +155,7 @@ volume_correlation_obs.write('''
 st.subheader('Close Prices vs Adj. Close Prices')
 st.plotly_chart(price_plot, use_container_width=True)
 
-prices_plot = st.expander('See Interpretations')
-prices_plot.write('''
+st.write('''
                   Interpretations:\
                   
                   * The 'Adj Close' accounts for dividends and stock splits.\
@@ -173,8 +167,7 @@ prices_plot.write('''
 st.subheader('Significant Adjustements')
 st.plotly_chart(diff_in_prices, use_container_width=True)
 
-adjusments = st.expander('See Observations')
-adjusments.write('''
+st.write('''
                  Observations:\
                  
                  * Adjustments represent impact of dividends and stock splits over the period.\
@@ -188,8 +181,7 @@ adjusments.write('''
 st.subheader('Decomposition of TimeSeries')
 st.plotly_chart(trend, use_container_width=True)
 
-decomposition_trend = st.expander('See Interpretation')
-decomposition_trend.write('''
+st.write('''
                           Interpretation:\
 
                           * The trend component captures the long-term progression of the series. It shows the general direction in which the data is moving over a long period, ignoring short-term fluctuations and noise.\
@@ -199,8 +191,7 @@ decomposition_trend.write('''
 
 st.plotly_chart(seasonality, use_container_width=True)
 
-decomposition_seasonality = st.expander('See Interpretation')
-decomposition_seasonality.write('''
+st.write('''
                           Interpretation:\
 
                           * Seasonality refers to the repeated patterns or cycles observed at regular intervals due to seasonal factors. This component is consistent and predictable over the time period.\
@@ -210,8 +201,7 @@ decomposition_seasonality.write('''
 
 st.plotly_chart(cyclic, use_container_width=True)
 
-decomposition_cyclic = st.expander('See Interpretation')
-decomposition_cyclic.write('''
+st.write('''
                           Interpretation:\
 
                           * Cyclic Variations capture fluctuations that occur at irregular intervals, often influenced by economic cycles, market conditions, or other external factors. Unlike seasonality, cyclic variations do not have a fixed period.\
@@ -221,8 +211,7 @@ decomposition_cyclic.write('''
 
 st.plotly_chart(residuals, use_container_width=True)
 
-decomposition_residuals = st.expander('See Interpretation')
-decomposition_residuals.write('''
+st.write('''
                           Interpretation:\
 
                           * The residual component captures the remaining variability in the data after removing the trend, seasonal, and cyclic components. It represents the irregular, random fluctuations in the series.\
