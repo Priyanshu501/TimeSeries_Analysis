@@ -1,6 +1,8 @@
+''' Contains all the necessary functions for Statistical Calculations '''
 import pandas as pd
 
 def preprocessing(df):
+    ''' Data Preprocessing '''
     # Converting Date Colume to Date Time Format
     df['Date'] = pd.to_datetime(df['Date'], format='%d-%m-%Y')
 

@@ -1,10 +1,11 @@
+''' Contains all the Visualizations '''
 import pandas as pd
 import plotly as px
 import plotly.express as exp
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-from src.utilities import preprocessing
 from statsmodels.tsa.seasonal import seasonal_decompose
+from src.utilities import preprocessing
 
 # Importing Dataset
 data = pd.read_csv('./data/AAPL.csv')
@@ -258,7 +259,7 @@ seasonality.update_xaxes(title_text = 'Date')
 seasonality.update_layout(title_text='Seasonality')
 
 # Decomposition: Cyclic Variations
-cyclic_variation = decompositions.trend - decompositions.trend.rolling(window=365, center=True).mean()
+cyclic_variation = decompositions.trend - decompositions.trend.rolling(window=365, center=True).mean() # pylint: disable=line-too-long
 
 cyclic = exp.line(cyclic_variation)
 

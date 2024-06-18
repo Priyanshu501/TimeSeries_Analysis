@@ -1,9 +1,8 @@
-from src.visualizations import *
+''' Exploratory Data Analysis '''
 import streamlit as st
+from src.visualizations import df, stock_data, density_plot, line_plots, line_plots2, pct_change, kde_plot, volume_plot, volume_correlation, price_plot, diff_in_prices, trend, seasonality, cyclic, residuals # pylint: disable=line-too-long
 
-st.set_page_config(
-    page_title='Exploratory Data Analysis'
-)
+st.set_page_config(page_title='Exploratory Data Analysis')
 
 # Title
 st.title('Exploratory Data Analysis', )
