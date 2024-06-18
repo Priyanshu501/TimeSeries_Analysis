@@ -1,5 +1,9 @@
+from src.visualizations import *
 import streamlit as st
-from visualizations import *
+
+st.set_page_config(
+    page_title='Exploratory Data Analysis'
+)
 
 # Title
 st.title('Exploratory Data Analysis', )

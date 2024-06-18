@@ -13,3 +13,4 @@ jupyter=1.0.0=py39haa95532_9
 streamlit=1.22.0=py39haa95532_0
 statsmodels=0.14.0=py39h9128911_0
 plotly=5.19.0=py39h9909e9c_0
+pmdarima=2.0.4=py39h9128911_0

@@ -2,13 +2,12 @@ import pandas as pd
 import plotly as px
 import plotly.express as exp
 import plotly.graph_objects as go
-import plotly.figure_factory as ff
 from plotly.subplots import make_subplots
-from utilities import preprocessing
+from src.utilities import preprocessing
 from statsmodels.tsa.seasonal import seasonal_decompose
 
 # Importing Dataset
-data = pd.read_csv('../data/AAPL.csv')
+data = pd.read_csv('./data/AAPL.csv')
 df = preprocessing(data)
 stock_data = df
 
