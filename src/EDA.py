@@ -1,11 +1,5 @@
 import streamlit as st
-import pandas as pd
-from utilities import preprocessing
 from visualizations import *
-
-# Importing Dataset
-data = pd.read_csv('../data/AAPL.csv')
-stock_data = preprocessing(data)
 
 # Title
 st.title('Exploratory Data Analysis', )
@@ -46,7 +40,7 @@ st.write('''
          * **Volume:** The number of shares traded on that day.
 ''')
 view_dataset = st.expander("View Dataset")
-view_dataset.dataframe(stock_data, use_container_width=True)
+view_dataset.dataframe(df, use_container_width=True)
 
 # Statistical Description
 st.header('Statistical Overview')
@@ -137,4 +131,101 @@ per_change.write('''
 
 # Volume Traded over time
 st.subheader('Volume Traded over Time')
-st.plotly_chart(volume_plot)
+st.plotly_chart(volume_plot, use_container_width=True)
+
+volume_obs = st.expander("See Interpretation")
+volume_obs.write('''
+                 Interpretations:\
+                 
+                 * Range of Volume from 11.3M to 376.5M.\
+                 
+                 * The trading volume experienced significant fluctuations in 2012, indicating periods of high trading activity.\
+                 
+                 * As we see, Starting from 2017, there is a noticable decrease in trading volume, results reduced fluctuations, suggesting more stable trading activity in recent years.\
+                 
+                 * As trading volume increases, the closing price tends to decrease, suggesting selling pressure.
+''')
+
+st.plotly_chart(volume_correlation, use_container_width=True)
+volume_correlation_obs = st.expander("See Interpretation")
+volume_correlation_obs.write('''
+                             Interpretations:\
+                             
+                             * Negative Correlation: As trading volume increases, the closing price tends to decrease, suggesting selling pressure.\
+
+                             * High trading volumes are associated with lower closing prices.
+''')
+
+# Close Prices vs Adj Close Prices
+st.subheader('Close Prices vs Adj. Close Prices')
+st.plotly_chart(price_plot, use_container_width=True)
+
+prices_plot = st.expander('See Interpretations')
+prices_plot.write('''
+                  Interpretations:\
+                  
+                  * The 'Adj Close' accounts for dividends and stock splits.\
+                  
+                  * Close price shows actual transaction price, whereas Adj. Close reflects the true value after accounting for corporate actions.
+''')
+
+# Significant Adjustments
+st.subheader('Significant Adjustements')
+st.plotly_chart(diff_in_prices, use_container_width=True)
+
+adjusments = st.expander('See Observations')
+adjusments.write('''
+                 Observations:\
+                 
+                 * Adjustments represent impact of dividends and stock splits over the period.\
+                 
+                 * There are Significant Adjustments around 2012-2013.\
+                 
+                 * Decrease in the Latter years, indicate fewer major corporate actions.
+''')
+
+# Decomposition of Time Series
+st.subheader('Decomposition of TimeSeries')
+st.plotly_chart(trend, use_container_width=True)
+
+decomposition_trend = st.expander('See Interpretation')
+decomposition_trend.write('''
+                          Interpretation:\
+
+                          * The trend component captures the long-term progression of the series. It shows the general direction in which the data is moving over a long period, ignoring short-term fluctuations and noise.\
+
+                          * The trend line is generally upward from 2012 to 2020, indicating a consistent long-term increase in the AAPL stock price. There are periods of acceleration, especially from 2017 onward, where the stock price increases at a faster rate.
+''')
+
+st.plotly_chart(seasonality, use_container_width=True)
+
+decomposition_seasonality = st.expander('See Interpretation')
+decomposition_seasonality.write('''
+                          Interpretation:\
+
+                          * Seasonality refers to the repeated patterns or cycles observed at regular intervals due to seasonal factors. This component is consistent and predictable over the time period.\
+
+                          * The seasonal component shows a regular, recurring pattern on an annual basis. There are noticeable peaks and troughs each year, indicating that certain times of the year consistently experience higher or lower prices. This pattern repeats roughly every year, showing the impact of seasonal factors on the stock price.
+''')
+
+st.plotly_chart(cyclic, use_container_width=True)
+
+decomposition_cyclic = st.expander('See Interpretation')
+decomposition_cyclic.write('''
+                          Interpretation:\
+
+                          * Cyclic Variations capture fluctuations that occur at irregular intervals, often influenced by economic cycles, market conditions, or other external factors. Unlike seasonality, cyclic variations do not have a fixed period.\
+
+                          * The cyclic component shows longer-term fluctuations that are not as regular as seasonal effects. For instance, there is a noticeable cyclic peak around 2018 and a trough around 2015, indicating periods of economic or market cycles affecting the stock price.
+''')
+
+st.plotly_chart(residuals, use_container_width=True)
+
+decomposition_residuals = st.expander('See Interpretation')
+decomposition_residuals.write('''
+                          Interpretation:\
+
+                          * The residual component captures the remaining variability in the data after removing the trend, seasonal, and cyclic components. It represents the irregular, random fluctuations in the series.\
+
+                          * The residuals show high-frequency variability that does not follow any predictable pattern. Periods with larger residuals indicate times of higher volatility or unexpected events impacting the stock price. For example, there is significant noise in the data around 2018 and again towards the end of 2019.
+''')

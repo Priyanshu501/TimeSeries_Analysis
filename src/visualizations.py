@@ -1,13 +1,16 @@
 import pandas as pd
 import plotly as px
+import plotly.express as exp
 import plotly.graph_objects as go
 import plotly.figure_factory as ff
 from plotly.subplots import make_subplots
 from utilities import preprocessing
+from statsmodels.tsa.seasonal import seasonal_decompose
 
 # Importing Dataset
 data = pd.read_csv('../data/AAPL.csv')
-stock_data = preprocessing(data)
+df = preprocessing(data)
+stock_data = df
 
 # Line Plots and Histograms
 density_plot = px.hist_frame(stock_data, x='Close', nbins=30)
@@ -113,10 +116,10 @@ line_plots2.add_trace(
 
 # Update xaxis properties
 line_plots2.update_xaxes(title_text="Date", row=1, col=1)
-line_plots2.update_xaxes(title_text="Date", row=1, col=1)
+line_plots2.update_xaxes(title_text="Date", row=2, col=1)
 
 # Update yaxis properties
-line_plots2.update_yaxes(title_text="Close", row=2, col=1)
+line_plots2.update_yaxes(title_text="Close", row=1, col=1)
 line_plots2.update_yaxes(title_text="Close", row=2, col=1)
 
 # Update title and height
@@ -142,3 +145,135 @@ volume_plot = px.plot(stock_data['Volume'], kind='line')
 volume_plot.update_layout(title = 'Volume Traded over Time')
 volume_plot.update_xaxes(title= 'Date')
 volume_plot.update_yaxes(title='Volume')
+
+# Correlation in Volume
+volume_correlation = exp.scatter(
+    stock_data,
+    x='Volume',
+    y='Close',
+    title='Correlation between Volume and Close Price',
+    labels={'Volume': 'Volume', 'Close': 'Close Price'},
+)
+
+# Close vs Adj. Close Price
+price_plot = go.Figure()
+price_plot.add_trace(
+    go.Scatter(
+        x=stock_data.index,
+        y=stock_data['Close'],
+        mode='lines',
+        name='Close Price',
+    )
+)
+
+price_plot.add_trace(
+    go.Scatter(
+        x=stock_data.index,
+        y=stock_data['Adj Close'],
+        mode='lines',
+        name='Adj. Close'
+    )
+)
+
+# Update axes titles
+price_plot.update_xaxes(title='Date')
+price_plot.update_yaxes(title='Price')
+
+# Update title
+price_plot.update_layout(title_text = 'AAPL Close Price vs Adj Close')
+
+
+# Significant Adjustments
+diff_in_prices = make_subplots(
+    rows=2,
+    cols=1,
+    subplot_titles=('"Close" vs "Adj. Close"', 'Difference between Close and Adj Close')
+)
+
+diff_in_prices.add_trace(
+    go.Scatter(
+        x=stock_data.index,
+        y=stock_data['Close'],
+        mode='lines',
+        name='Close Prices'
+    ),
+    row=1,
+    col=1,
+)
+
+diff_in_prices.add_trace(
+    go.Scatter(
+        x=stock_data.index,
+        y=stock_data['Adj Close'],
+        mode='lines',
+        name='Adj Close Prices'
+    ),
+    row=1,
+    col=1,
+)
+
+temp3 = stock_data['Close'] - stock_data['Adj Close']
+
+diff_in_prices.add_trace(
+    go.Scatter(
+        x=stock_data.index,
+        y=temp3,
+        mode='lines',
+        name='Difference (Close - Adj Close)'
+    ),
+    row=2,
+    col=1
+)
+
+# Update xaxis properties
+diff_in_prices.update_xaxes(title_text="Date", row=1, col=1)
+diff_in_prices.update_xaxes(title_text="Date", row=2, col=1)
+
+# Update yaxis properties
+diff_in_prices.update_yaxes(title_text="Close", row=1, col=1)
+diff_in_prices.update_yaxes(title_text="Difference", row=2, col=1)
+
+# Update title and height
+diff_in_prices.update_layout(title_text = 'Comparision of Close and Adj. Prices', height = 700)
+
+# Decomposition Plots
+decompositions = seasonal_decompose(stock_data['Close'], model='additive', period=365)
+
+# Decomposition: Trend
+trend = exp.line(decompositions.trend)
+
+# Update xaxis properties
+trend.update_xaxes(title_text = 'Date')
+trend.update_yaxes(title_text='Price')
+
+# Update title
+trend.update_layout(title_text='Trend')
+
+# Decomposition: Seasonality
+seasonality = exp.line(decompositions.seasonal)
+
+# Update xaxis properties
+seasonality.update_xaxes(title_text = 'Date')
+
+# Update Title
+seasonality.update_layout(title_text='Seasonality')
+
+# Decomposition: Cyclic Variations
+cyclic_variation = decompositions.trend - decompositions.trend.rolling(window=365, center=True).mean()
+
+cyclic = exp.line(cyclic_variation)
+
+# Update xaxis properties
+cyclic.update_xaxes(title_text = 'Date')
+
+# Update Title
+cyclic.update_layout(title_text='Cyclic Variations')
+
+# Decomposition: Residuals/Noise
+residuals = exp.line(decompositions.resid)
+
+# Update xaxis properties
+residuals.update_xaxes(title_text = 'Date')
+
+# Update Title
+residuals.update_layout(title_text='Residuals (Noise)')
