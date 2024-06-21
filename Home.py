@@ -49,6 +49,8 @@ st.write('''
          
     * **Exponential Smoothing**: Methods like Holt-Winters to capture trends and seasonality.\
          
+    * **Facebook Prophet**: Prophet is an open-source tool form Facebook used for forecasting time series data, based on a decomposable additive model where non-linear trends fit with seasonality.\
+         
 2. **Machine Learning Models**:\
          
     * **Random Forest**: A versatile model that can handle non-linear relationships in the data.\
