@@ -1,4 +1,4 @@
-''' Project Landing Page '''
+''' Project Landing Page '''# pylint: disable=invalid-name
 import streamlit as st
 
 st.set_page_config(page_title='Home')

@@ -1,0 +1,162 @@
+''' ARIMA Model ''' # pylint: disable=invalid-name
+import streamlit as st
+import src.utilities as utl #pylint: disable=import-error
+import src.visualizations as vis
+
+#----- Setting Page Configuration -----#
+st.set_page_config(page_title='ARIMA')\
+
+#----- Introduction -----#
+st.title('ARIMA Model Implementation')
+
+st.header('Introduction')
+st.write('''
+The ARIMA model stands for AutoRegressive Integrated Moveing Average. It is a popular statistical method used for time series forecasting.\
+
+In this section, we will explain how the ARIMA model works and how it can be applied to forecast Apple stock prices.
+''')
+
+#----- ARIMA Theory -----#
+st.header('Theory Behind ARIMA')
+st.write('''
+ARIMA consists of three main components:\
+
+1. **AutoRegressive (AR)**: This component uses the dependency between an observation and a number of lagged observations.\
+         
+2. **Integrated (I)**: This part involved differencing the raw observations to make the timeseries stationary.\
+         
+3. **Moving Average (MA)**: This component uses the dependency between an observation and a residual error from a moving average model applied to lagged observations.\
+         
+The ARIMA(p, d, q) model is defined as:
+''')
+
+# ARIMA Equation
+st.latex(r'''
+y_t = c + \phi_1 y_{t-1} + \phi_2 y_{t-2} + ... + \phi_p y_{t-p} + \theta_1 \epsilon_{t-1} + \theta_2 \epsilon_{t-2} + ... + \theta_q \epsilon_{t-q} + \epsilon_t
+''')
+
+#----- Data Preprocessing -----#
+st.header('Data Preprocessing for ARIMA')
+
+# Displaying Dataset
+st.write('Dataset Overview:')
+st.dataframe(utl.df, use_container_width=True)
+
+#--- Stationarity ---#
+st.subheader('Stationarity')
+st.write('''
+A stationarity time series has statistical properties, such as mean and variance, that are constant over time.\
+         
+We use the Augmented Dickey-Fuller (ADF) test to check for stationarity.
+''')
+
+# Hypothesis Test
+st.write('**Hypothesis Test to evaluate Stationarity**:')
+st.write('''
+**Null Hypothesis**: Time Series is Non-Stationary.\
+         
+**Alternative Hypothesis**: Time Series is Stationary.\
+''')
+st.write('''
+**If** the `p-value` of the test is less than the significance level of `0.05`,\
+         
+**Then** we can reject the Null Hypothesis and conclude that the time series is indeed stationary.
+''')
+
+# Stationarity Code
+stationarity_test = st.expander('See Code:')
+stationarity_test.code('''
+    from statsmodels.tsa.stattools import adfuller
+    
+    adf_result = adfuller(df['Close'])
+    print(f'ADF Statistic: {adf_result[0]:.2f}')
+    print(f'p-value: {adf_result[1]:.2f}')
+
+    if adf_result[1] > 0.05:
+        print('Accept Null Hypothesis: Data is non-stationary')
+    else:
+        print('Reject Null Hypothesis: Data is stationary')
+''')
+
+# Conducting Hypothesis Test
+if utl.arima_stationarity_test(utl.df) == 'non-stationary':
+    st.success('Accept Null Hypothesis: Data is non-stationary')
+else:
+    st.error('Reject Null Hypothesis: Data is stationary')
+
+# Differencing
+st.write('If the series is not stationary, we difference it.')
+st.write('''
+We can find the difference by subtracting the previous value from the current value. Now if we just difference once, we might not get a stationary series so we might need to do that multiple times.
+''')
+st.write('''
+So, for simplicity we will use `pmdarima` library to find the Differenceing (d):
+''')
+
+# Calculating Differencing
+differencing = st.expander('See Code:')
+differencing.code('''
+from pmdarima.arima.utils import ndiffs
+        
+print('Differencing: \\nd = ', ndiffs(df['Close'], test='adf'))
+''')
+
+st.code(f'd = {utl.arima_differencing(utl.df)}')
+
+#--- Order of Autoregressive Model ---#
+st.subheader('Order of Autoregressive Model (q)')
+st.write('''
+We can find out the required number of AutoRegresssive Model by instpecting the Partial Autocorrelations (PACF) plot.
+''')
+st.write('''
+The Partial Auto Correlations represents the correlation between the series and its lags.
+''')
+
+# PACF Plot
+pacf_plot = st.expander('See Code:')
+pacf_plot.code('''
+import matplotlib.pyplot as plt
+from statsmodels.graphics.tsaplots import plot_pacf
+
+diff = df['Close'].diff().dropna()
+plot_pacf(diff)
+plt.show()
+''')
+
+st.plotly_chart(vis.autocorrelation_plot(utl.df, plot_pacf=True))
+st.write('''
+We can observe that the lag point 7 is significant as it is just above the significance line.\n
+Therefore, let's consider:
+''')
+st.code('q = 7')
+
+#--- Order of Moving Average ---#
+st.subheader('Order of Moving Average (p)')
+st.write('''
+Order of Moving Average refers to the number of lagged forecast errors that should go into the ARIMA model.\n
+We can look at the ACF plot to define the number of MA terms.
+''')
+
+# ACF Plot
+acf_plot = st.expander('See Code:')
+acf_plot.code('''
+import matplotlib.pyplot as plt
+from statsmodels.graphics.tsaplots import plot_acf
+
+diff = df['Close'].diff().dropna()
+plot_acf(diff)
+plt.show()
+''')
+
+st.plotly_chart(vis.autocorrelation_plot(utl.df, plot_pacf=False))
+st.write('''
+We can observe that the lag point 2 is  just at the significance line.\n
+Therefore, let's consider:
+''')
+st.code('p = 2')
+
+#----- Model Building -----#
+st.header('Model Building')
+st.write('''
+Using the Identified Parameters, we will build the ARIMA model.
+''')

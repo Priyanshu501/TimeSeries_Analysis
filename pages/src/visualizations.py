@@ -1,15 +1,17 @@
 ''' Contains all the Visualizations '''
 import pandas as pd
+import numpy as np
 import plotly as px
 import plotly.express as exp
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from statsmodels.tsa.seasonal import seasonal_decompose
-from src.utilities import preprocessing
+from statsmodels.tsa.stattools import pacf, acf
+import src.utilities as utl #pylint: disable=import-error
 
 # Importing Dataset
-data = pd.read_csv('./data/AAPL.csv')
-df = preprocessing(data)
+data = pd.read_csv('../data/AAPL.csv')
+df = utl.preprocessing(data)
 stock_data = df
 
 # Line Plots and Histograms
@@ -277,3 +279,60 @@ residuals.update_xaxes(title_text = 'Date')
 
 # Update Title
 residuals.update_layout(title_text='Residuals (Noise)')
+
+def autocorrelation_plot(series, plot_pacf=False, alpha=0.05):
+    ''' Creates an ACF or PACF plot '''
+    if plot_pacf:
+        corr_array = pacf(series['Close'].diff().dropna(), alpha=alpha)
+    else:
+        corr_array = acf(series['Close'].diff().dropna(), alpha=alpha)
+
+    lower_y = corr_array[1][:,0] - corr_array[0]
+    upper_y = corr_array[1][:,1] - corr_array[0]
+
+    fig = go.Figure()
+
+    for x in range(len(corr_array[0])):
+        fig.add_scatter(
+            x=(x,x),
+            y=(0,corr_array[0][x]),
+            mode='lines',
+            line_color='#3f3f3f'
+            )
+
+    fig.add_scatter(
+        x=np.arange(len(corr_array[0])),
+        y=corr_array[0],
+        mode='markers',
+        marker_color='#1f77b4',
+        marker_size=12
+        )
+
+    fig.add_scatter(
+        x=np.arange(len(corr_array[0])),
+        y=upper_y,
+        mode='lines',
+        line_color='rgba(255,255,255,0)'
+        )
+
+    fig.add_scatter(
+        x=np.arange(len(corr_array[0])),
+        y=lower_y,
+        mode='lines',
+        fillcolor='rgba(32, 146, 230,0.3)',
+        fill='tonexty',
+        line_color='rgba(255,255,255,0)'
+        )
+
+    fig.update_traces(showlegend=False)
+    fig.update_xaxes(range=[-1,42])
+    fig.update_yaxes(zerolinecolor='#000000')
+
+    if plot_pacf:
+        title = 'Partial Autocorrelation (PACF)'
+    else:
+        title = 'Autocorrelation (ACF)'
+
+    fig.update_layout(title=title)
+
+    return fig
