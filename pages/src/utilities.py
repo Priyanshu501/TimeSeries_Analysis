@@ -76,7 +76,7 @@ def arima_fit_model(data, p=1, d=1, q=1):
     original_test = data.iloc[size:]
 
     # Exporting Model
-    directory = 'src/models'
+    directory = 'pages/src/models'
     os.makedirs(directory, exist_ok=True)
     model_path = os.path.join(directory, 'arima.joblib')
     joblib.dump(fitted_model, model_path)
@@ -85,7 +85,7 @@ def arima_fit_model(data, p=1, d=1, q=1):
 
 def forecast(model, steps, data=df):
     ''' Forecasts the Stock Prices '''
-    model_path = 'src/models/' + model + '.joblib'
+    model_path = 'pages/src/models/' + model + '.joblib'
     model = joblib.load(model_path)
     forecasted_values = model.forecast(steps=steps)
 
