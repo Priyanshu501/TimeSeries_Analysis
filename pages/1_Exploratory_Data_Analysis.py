@@ -1,6 +1,7 @@
-''' Exploratory Data Analysis '''
+''' Exploratory Data Analysis ''' # pylint: disable=invalid-name
 import streamlit as st
-from src.visualizations import df, stock_data, density_plot, line_plots, line_plots2, pct_change, kde_plot, volume_plot, volume_correlation, price_plot, diff_in_prices, trend, seasonality, cyclic, residuals # pylint: disable=line-too-long
+import pages.src.utilities as utl
+import pages.src.visualizations as vis
 
 st.set_page_config(page_title='Exploratory Data Analysis')
 
@@ -43,11 +44,11 @@ st.write('''
          * **Volume:** The number of shares traded on that day.
 ''')
 
-st.dataframe(df, use_container_width=True)
+st.dataframe(utl.df, use_container_width=True)
 
 # Statistical Description
 st.header('Statistical Overview')
-st.write(stock_data.describe())
+st.write(utl.df.describe())
 
 st.write('Key Oberservations: (Open, High, Low, Close)')
 st.write('''
@@ -74,7 +75,7 @@ st.header('Visualizations')
 
 # Density Plot
 st.subheader('Line Plots and Histograms')
-st.plotly_chart(density_plot, use_container_width=True)
+st.plotly_chart(vis.density_plot, use_container_width=True)
 
 st.write('''
         Observations:\
@@ -86,7 +87,7 @@ st.write('''
 
 # Stock Data Overview
 st.subheader('Observations from Line Plots' )
-st.plotly_chart(line_plots, use_container_width=True)
+st.plotly_chart(vis.line_plots, use_container_width=True)
 
 st.write('''
                      Interpretations:\
@@ -98,7 +99,7 @@ st.write('''
                      * As we can see all line plots follow a consistent pattern
 ''')
 
-st.plotly_chart(line_plots2, use_container_width=True)
+st.plotly_chart(vis.line_plots2, use_container_width=True)
 
 st.write('''
                       Interpretations:\
@@ -109,8 +110,8 @@ st.write('''
 ''')
 
 # Daily Percentage Changes in Closing Prices
-st.plotly_chart(pct_change, use_container_width=True)
-st.plotly_chart(kde_plot, use_container_width=True)
+st.plotly_chart(vis.pct_change, use_container_width=True)
+st.plotly_chart(vis.kde_plot, use_container_width=True)
 
 st.write('''
                  Interpretations:\
@@ -130,7 +131,7 @@ st.write('''
 
 # Volume Traded over time
 st.subheader('Volume Traded over Time')
-st.plotly_chart(volume_plot, use_container_width=True)
+st.plotly_chart(vis.volume_plot, use_container_width=True)
 
 st.write('''
                  Interpretations:\
@@ -144,7 +145,7 @@ st.write('''
                  * As trading volume increases, the closing price tends to decrease, suggesting selling pressure.
 ''')
 
-st.plotly_chart(volume_correlation, use_container_width=True)
+st.plotly_chart(vis.volume_correlation, use_container_width=True)
 
 st.write('''
                              Interpretations:\
@@ -156,7 +157,7 @@ st.write('''
 
 # Close Prices vs Adj Close Prices
 st.subheader('Close Prices vs Adj. Close Prices')
-st.plotly_chart(price_plot, use_container_width=True)
+st.plotly_chart(vis.price_plot, use_container_width=True)
 
 st.write('''
                   Interpretations:\
@@ -168,7 +169,7 @@ st.write('''
 
 # Significant Adjustments
 st.subheader('Significant Adjustements')
-st.plotly_chart(diff_in_prices, use_container_width=True)
+st.plotly_chart(vis.diff_in_prices, use_container_width=True)
 
 st.write('''
                  Observations:\
@@ -182,7 +183,7 @@ st.write('''
 
 # Decomposition of Time Series
 st.subheader('Decomposition of TimeSeries')
-st.plotly_chart(trend, use_container_width=True)
+st.plotly_chart(vis.trend, use_container_width=True)
 
 st.write('''
                           Interpretation:\
@@ -192,7 +193,7 @@ st.write('''
                           * The trend line is generally upward from 2012 to 2020, indicating a consistent long-term increase in the AAPL stock price. There are periods of acceleration, especially from 2017 onward, where the stock price increases at a faster rate.
 ''')
 
-st.plotly_chart(seasonality, use_container_width=True)
+st.plotly_chart(vis.seasonality, use_container_width=True)
 
 st.write('''
                           Interpretation:\
@@ -202,7 +203,7 @@ st.write('''
                           * The seasonal component shows a regular, recurring pattern on an annual basis. There are noticeable peaks and troughs each year, indicating that certain times of the year consistently experience higher or lower prices. This pattern repeats roughly every year, showing the impact of seasonal factors on the stock price.
 ''')
 
-st.plotly_chart(cyclic, use_container_width=True)
+st.plotly_chart(vis.cyclic, use_container_width=True)
 
 st.write('''
                           Interpretation:\
@@ -212,7 +213,7 @@ st.write('''
                           * The cyclic component shows longer-term fluctuations that are not as regular as seasonal effects. For instance, there is a noticeable cyclic peak around 2018 and a trough around 2015, indicating periods of economic or market cycles affecting the stock price.
 ''')
 
-st.plotly_chart(residuals, use_container_width=True)
+st.plotly_chart(vis.residuals, use_container_width=True)
 
 st.write('''
                           Interpretation:\

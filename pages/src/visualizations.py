@@ -1,5 +1,4 @@
 ''' Contains all the Visualizations '''
-import pandas as pd
 import numpy as np
 import plotly as px
 import plotly.express as exp
@@ -7,15 +6,10 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from statsmodels.tsa.seasonal import seasonal_decompose
 from statsmodels.tsa.stattools import pacf, acf
-import src.utilities as utl #pylint: disable=import-error
-
-# Importing Dataset
-data = pd.read_csv('../data/AAPL.csv')
-df = utl.preprocessing(data)
-stock_data = df
+import pages.src.utilities as utl #pylint: disable=import-error
 
 # Line Plots and Histograms
-density_plot = px.hist_frame(stock_data, x='Close', nbins=30)
+density_plot = px.hist_frame(utl.df, x='Close', nbins=30)
 density_plot.update_layout(title = 'Distribution of Closing Prices')
 
 # Observations from Line Plots
@@ -27,8 +21,8 @@ line_plots = make_subplots(
 
 line_plots.add_trace(
     go.Scatter(
-        x=stock_data.index,
-        y=stock_data['Open'],
+        x=utl.df.index,
+        y=utl.df['Open'],
         mode='lines',
         name='Open'
     ),
@@ -38,8 +32,8 @@ line_plots.add_trace(
 
 line_plots.add_trace(
     go.Scatter(
-        x=stock_data.index,
-        y=stock_data['High'],
+        x=utl.df.index,
+        y=utl.df['High'],
         mode='lines',
         name='High'
     ),
@@ -49,8 +43,8 @@ line_plots.add_trace(
 
 line_plots.add_trace(
     go.Scatter(
-        x=stock_data.index,
-        y=stock_data['Low'],
+        x=utl.df.index,
+        y=utl.df['Low'],
         mode='lines',
         name='Low'
     ),
@@ -60,8 +54,8 @@ line_plots.add_trace(
 
 line_plots.add_trace(
     go.Scatter(
-        x=stock_data.index,
-        y=stock_data['Close'],
+        x=utl.df.index,
+        y=utl.df['Close'],
         mode='lines',
         name='Close'
     ),
@@ -91,8 +85,8 @@ line_plots2 = make_subplots(
     subplot_titles=('AAPL Close Price (2012-2013)', 'AAPL Close Price (2016-2017)')
 )
 
-temp1 = stock_data['2012-01-01':'2013-12-31']
-temp2 = stock_data['2016-01-01':'2017-12-31']
+temp1 = utl.df['2012-01-01':'2013-12-31']
+temp2 = utl.df['2016-01-01':'2017-12-31']
 
 line_plots2.add_trace(
     go.Scatter(
@@ -129,28 +123,28 @@ line_plots2.update_layout(title_text = 'Volatility between 2012-2013 and 2016-20
 
 
 # Daily Percentage Changes in closing price
-stock_data['pct_change'] = stock_data['Close'].pct_change(periods=1) * 100
+utl.df['pct_change'] = utl.df['Close'].pct_change(periods=1) * 100
 
-pct_change = px.plot(stock_data['pct_change'], kind='line')
+pct_change = px.plot(utl.df['pct_change'], kind='line')
 pct_change.update_layout(title = 'Percentage Change in Close Price')
 pct_change.update_xaxes(title= 'Date')
 pct_change.update_yaxes(title='Percentage Change')
 
 # KDE Plot
-kde_plot = px.hist_frame(stock_data, x='pct_change', nbins=30)
+kde_plot = px.hist_frame(utl.df, x='pct_change', nbins=30)
 kde_plot.update_layout(title = 'Distribution of Percentage Change in Close Price')
 kde_plot.update_xaxes(title= 'Percentage Change')
 kde_plot.update_yaxes(title='Distribution')
 
 # Pattern in Volume
-volume_plot = px.plot(stock_data['Volume'], kind='line')
+volume_plot = px.plot(utl.df['Volume'], kind='line')
 volume_plot.update_layout(title = 'Volume Traded over Time')
 volume_plot.update_xaxes(title= 'Date')
 volume_plot.update_yaxes(title='Volume')
 
 # Correlation in Volume
 volume_correlation = exp.scatter(
-    stock_data,
+    utl.df,
     x='Volume',
     y='Close',
     title='Correlation between Volume and Close Price',
@@ -161,8 +155,8 @@ volume_correlation = exp.scatter(
 price_plot = go.Figure()
 price_plot.add_trace(
     go.Scatter(
-        x=stock_data.index,
-        y=stock_data['Close'],
+        x=utl.df.index,
+        y=utl.df['Close'],
         mode='lines',
         name='Close Price',
     )
@@ -170,8 +164,8 @@ price_plot.add_trace(
 
 price_plot.add_trace(
     go.Scatter(
-        x=stock_data.index,
-        y=stock_data['Adj Close'],
+        x=utl.df.index,
+        y=utl.df['Adj Close'],
         mode='lines',
         name='Adj. Close'
     )
@@ -194,8 +188,8 @@ diff_in_prices = make_subplots(
 
 diff_in_prices.add_trace(
     go.Scatter(
-        x=stock_data.index,
-        y=stock_data['Close'],
+        x=utl.df.index,
+        y=utl.df['Close'],
         mode='lines',
         name='Close Prices'
     ),
@@ -205,8 +199,8 @@ diff_in_prices.add_trace(
 
 diff_in_prices.add_trace(
     go.Scatter(
-        x=stock_data.index,
-        y=stock_data['Adj Close'],
+        x=utl.df.index,
+        y=utl.df['Adj Close'],
         mode='lines',
         name='Adj Close Prices'
     ),
@@ -214,11 +208,11 @@ diff_in_prices.add_trace(
     col=1,
 )
 
-temp3 = stock_data['Close'] - stock_data['Adj Close']
+temp3 = utl.df['Close'] - utl.df['Adj Close']
 
 diff_in_prices.add_trace(
     go.Scatter(
-        x=stock_data.index,
+        x=utl.df.index,
         y=temp3,
         mode='lines',
         name='Difference (Close - Adj Close)'
@@ -239,7 +233,7 @@ diff_in_prices.update_yaxes(title_text="Difference", row=2, col=1)
 diff_in_prices.update_layout(title_text = 'Comparision of Close and Adj. Prices', height = 700)
 
 # Decomposition Plots
-decompositions = seasonal_decompose(stock_data['Close'], model='additive', period=365)
+decompositions = seasonal_decompose(utl.df['Close'], model='additive', period=365)
 
 # Decomposition: Trend
 trend = exp.line(decompositions.trend)
@@ -335,4 +329,73 @@ def autocorrelation_plot(series, plot_pacf=False, alpha=0.05):
 
     fig.update_layout(title=title)
 
+    return fig
+
+def model_visulization(train, test, forecast):
+    ''' Model Evaluation using RMSE and Residuals '''
+    fig = go.Figure()
+    fig.add_trace(
+        go.Scatter(
+            x=train.index,
+            y=train['Close'],
+            mode='lines',
+            name='Train'
+        )
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=test.index,
+            y=test['Close'],
+            mode='lines',
+            name='Test'
+        )
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=forecast.index,
+            y=forecast['Forecast'],
+            mode='lines',
+            name='Forecasted Values',
+            line=dict(dash='dot')
+        )
+    )
+
+    # Update axes titles
+    fig.update_xaxes(title='Date')
+    fig.update_yaxes(title='Price')
+
+    # Update title
+    fig.update_layout(title_text = 'Model Evaluation')
+    return fig
+
+def final_forecast(forecast, train=utl.df):
+    ''' Visulizes the Forecasted Data  '''
+    fig = go.Figure()
+    fig.add_trace(
+        go.Scatter(
+            x=train.index,
+            y=train['Close'],
+            mode='lines',
+            name='Original Data'
+        )
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=forecast.index,
+            y=forecast['Forecast'],
+            mode='lines',
+            name='Forecasted Values',
+            line=dict(color='firebrick')
+        )
+    )
+
+    # Update axes titles
+    fig.update_xaxes(title='Date')
+    fig.update_yaxes(title='Price')
+
+    # Update title
+    fig.update_layout(title_text = 'Forecast')
     return fig

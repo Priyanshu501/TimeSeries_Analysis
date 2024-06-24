@@ -1,7 +1,7 @@
 ''' ARIMA Model ''' # pylint: disable=invalid-name
 import streamlit as st
-import src.utilities as utl #pylint: disable=import-error
-import src.visualizations as vis
+import pages.src.utilities as utl #pylint: disable=import-error
+import pages.src.visualizations as vis
 
 #----- Setting Page Configuration -----#
 st.set_page_config(page_title='ARIMA')\
@@ -160,3 +160,27 @@ st.header('Model Building')
 st.write('''
 Using the Identified Parameters, we will build the ARIMA model.
 ''')
+
+p = st.number_input('Enter value for p:', min_value=0, value=2)
+d = st.number_input('Enter value for d:', min_value=0, value=1)
+q = st.number_input('Enter value for q:', min_value=0, value=7)
+
+if st.button('Fit Model: ARIMA'):
+    train, test, forecast = utl.arima_fit_model(utl.df, p=p, d=d, q=q)
+
+    #----- Model Evaluation -----#
+    st.header('Model Evaluation')
+    st.write('''
+    We will evaluate the model using metrics such as RMSE and visualize the residuals to check the model adequacy.
+    ''')
+    st.plotly_chart(vis.model_visulization(train=train, test=test, forecast=forecast))
+
+    #----- Forecasting -----#
+    st.header('Forecasting')
+    st.write('''
+    We use the fitted model to frecast the next 30 days of stock prices.
+    ''')
+    days = st.slider('Enter Forecaste Days', min_value=10, max_value=30, value=30)
+
+    forecast_values = utl.forecast(model='arima', steps=days)
+    st.plotly_chart(vis.final_forecast(forecast=forecast_values))
