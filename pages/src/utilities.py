@@ -9,6 +9,10 @@ from pmdarima.arima.utils import ndiffs
 from statsmodels.tsa.arima.model import ARIMA
 from statsmodels.tsa.stattools import adfuller
 
+def get_session_state():
+    ''' Function to create and persist session state '''
+    return st.session_state
+
 def preprocessing(data):
     ''' Data Preprocessing '''
     # Converting Date Colume to Date Time Format
@@ -75,22 +79,22 @@ def arima_fit_model(data, p=1, d=1, q=1):
     original_train = data.iloc[:size]
     original_test = data.iloc[size:]
 
-    # Exporting Model
-    directory = 'pages/src/models'
-    os.makedirs(directory, exist_ok=True)
-    model_path = os.path.join(directory, 'arima.joblib')
-    joblib.dump(fitted_model, model_path)
-
     return original_train, original_test, forecast_df
 
-def forecast(model, steps, data=df):
-    ''' Forecasts the Stock Prices '''
-    model_path = 'pages/src/models/' + model + '.joblib'
-    model = joblib.load(model_path)
-    forecasted_values = model.forecast(steps=steps)
-
+def arima_forecast(steps, p=1, d=1, q=1, data=df):
+    ''' Forecasts the Stock Prices '''   
+    # Standardizing Data
     scaler = StandardScaler()
-    scaler.fit_transform(data[['Close']])
+    scaled_data = scaler.fit_transform(data[['Close']])
+    scaled_df = pd.DataFrame(scaled_data, columns=['Close'])
+    scaled_df.index = data.index
+
+    # Fitting Model
+    model = ARIMA(scaled_df, order=(p, d, q))
+    fitted_model = model.fit()
+
+    forecasted_values = fitted_model.forecast(steps=steps)
+
     forecasted_values = scaler.inverse_transform(forecasted_values.values.reshape(-1,1))
 
     forecasts_dates = pd.date_range(
@@ -104,5 +108,11 @@ def forecast(model, steps, data=df):
         index = forecasts_dates,
         columns=['Forecast']
         )
+
+    # Exporting Model
+    directory = 'pages/src/models'
+    os.makedirs(directory, exist_ok=True)
+    model_path = os.path.join(directory, 'arima.joblib')
+    joblib.dump(fitted_model, model_path)
 
     return forecasts_df

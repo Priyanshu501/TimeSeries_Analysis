@@ -6,6 +6,19 @@ import pages.src.visualizations as vis
 #----- Setting Page Configuration -----#
 st.set_page_config(page_title='ARIMA')\
 
+session_state = utl.get_session_state()
+if 'p' not in session_state:
+    session_state.p = 1
+
+if 'd' not in session_state:
+    session_state.d = 1
+
+if 'q' not in session_state:
+    session_state.q = 1
+
+if 'forecast_days' not in session_state:
+    session_state.forecast_days = 30
+
 #----- Introduction -----#
 st.title('ARIMA Model Implementation')
 
@@ -161,12 +174,17 @@ st.write('''
 Using the Identified Parameters, we will build the ARIMA model.
 ''')
 
-p = st.number_input('Enter value for p:', min_value=0, value=2)
-d = st.number_input('Enter value for d:', min_value=0, value=1)
-q = st.number_input('Enter value for q:', min_value=0, value=7)
+session_state.p = st.number_input('Enter value for p:', min_value=0, value=2)
+session_state.d = st.number_input('Enter value for d:', min_value=0, value=1)
+session_state.q = st.number_input('Enter value for q:', min_value=0, value=7)
 
 if st.button('Fit Model: ARIMA'):
-    train, test, forecast = utl.arima_fit_model(utl.df, p=p, d=d, q=q)
+    train, test, forecast = utl.arima_fit_model(
+        utl.df,
+        p=session_state.p,
+        d=session_state.d,
+        q=session_state.q
+        )
 
     #----- Model Evaluation -----#
     st.header('Model Evaluation')
@@ -175,12 +193,23 @@ if st.button('Fit Model: ARIMA'):
     ''')
     st.plotly_chart(vis.model_visulization(train=train, test=test, forecast=forecast))
 
-    #----- Forecasting -----#
-    st.header('Forecasting')
-    st.write('''
-    We use the fitted model to frecast the next 30 days of stock prices.
-    ''')
-    days = st.slider('Enter Forecaste Days', min_value=10, max_value=30, value=30)
+#----- Forecasting -----#
+st.header('Forecasting')
+st.write('''
+We use the fitted model to frecast the next 30 days of stock prices.
+''')
+session_state.forecast_days = st.slider(
+    'Enter Forecaste Days',
+    min_value=10,
+    max_value=30,
+    value=30
+    )
 
-    forecast_values = utl.forecast(model='arima', steps=days)
+if st.button('Forecast'):
+    forecast_values = utl.arima_forecast(
+        steps=session_state.forecast_days,
+        p=session_state.p,
+        d=session_state.d,
+        q=session_state.q
+        )
     st.plotly_chart(vis.final_forecast(forecast=forecast_values))
