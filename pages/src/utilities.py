@@ -9,12 +9,15 @@ from pmdarima.arima.utils import ndiffs
 from statsmodels.tsa.arima.model import ARIMA
 from statsmodels.tsa.stattools import adfuller
 
+#----- Session State Configuration Initialization -----#
 def get_session_state():
     ''' Function to create and persist session state '''
     return st.session_state
 
+#----- Data Cleaning -----#
 def preprocessing(data):
     ''' Data Preprocessing '''
+
     # Converting Date Colume to Date Time Format
     data['Date'] = pd.to_datetime(data['Date'], format='%d-%m-%Y')
 
@@ -22,10 +25,13 @@ def preprocessing(data):
     data = data.set_index('Date').rename_axis(None)
     return data
 
+#----- Data Set (Ready to Use) -----#
 df = preprocessing(pd.read_csv('./data/AAPL.csv'))
 
+#----- ARIMA: Checking Stationarity -----#
 def arima_stationarity_test(data):
     ''' Checking Stationarity of the Data '''
+
     adf_result = adfuller(data['Close'] * 0.80)
     st.code(f'ADF Statistic: {adf_result[0]:.2f}')
     st.code(f'p-value: {adf_result[1]:.2f}')
@@ -35,10 +41,13 @@ def arima_stationarity_test(data):
     else:
         return 'stationary'
 
+#----- ARIMA: Calculating Differencing -----#
 def arima_differencing(data):
     ''' Calculates Differencing '''
+
     return ndiffs(data['Close'], test='adf')
 
+#----- ARIMA: Model Fitting and Evaluation -----#
 def arima_fit_model(data, p=1, d=1, q=1):
     ''' Train ARIMA Model '''
 
@@ -81,8 +90,10 @@ def arima_fit_model(data, p=1, d=1, q=1):
 
     return original_train, original_test, forecast_df
 
+#---- ARIMA: Forecasting Stock Prices -----#
 def arima_forecast(steps, p=1, d=1, q=1, data=df):
-    ''' Forecasts the Stock Prices '''   
+    ''' Forecasts the Stock Prices '''
+
     # Standardizing Data
     scaler = StandardScaler()
     scaled_data = scaler.fit_transform(data[['Close']])
@@ -93,16 +104,16 @@ def arima_forecast(steps, p=1, d=1, q=1, data=df):
     model = ARIMA(scaled_df, order=(p, d, q))
     fitted_model = model.fit()
 
+    # Forecasting Prices
     forecasted_values = fitted_model.forecast(steps=steps)
-
     forecasted_values = scaler.inverse_transform(forecasted_values.values.reshape(-1,1))
 
+    # Creating Dataframe of Forecasted Prices
     forecasts_dates = pd.date_range(
         start = data.index[-1] + pd.Timedelta(days=1),
         periods = steps,
         freq = 'D'
     )
-
     forecasts_df = pd.DataFrame(
         forecasted_values,
         index = forecasts_dates,

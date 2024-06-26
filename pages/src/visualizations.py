@@ -8,17 +8,23 @@ from statsmodels.tsa.seasonal import seasonal_decompose
 from statsmodels.tsa.stattools import pacf, acf
 import pages.src.utilities as utl #pylint: disable=import-error
 
-# Line Plots and Histograms
+#----- EDA: Histograms/Density Plot -----#
+
+# Distribution of Closing Prices
 density_plot = px.hist_frame(utl.df, x='Close', nbins=30)
 density_plot.update_layout(title = 'Distribution of Closing Prices')
 
-# Observations from Line Plots
+#----- EDA: Line Plots -----#
+
+# Stock Data Overview
+
+## Initializing Subplots
 line_plots = make_subplots(
     rows=2,
     cols=2,
     subplot_titles=('Open Prices', 'High Prices', 'Low Prices', 'Close Prices')
 )
-
+## Plot: Open Prices
 line_plots.add_trace(
     go.Scatter(
         x=utl.df.index,
@@ -29,7 +35,7 @@ line_plots.add_trace(
     row=1,
     col=1
 )
-
+## Plot: High Prices
 line_plots.add_trace(
     go.Scatter(
         x=utl.df.index,
@@ -40,7 +46,7 @@ line_plots.add_trace(
     row=1,
     col=2
 )
-
+## Plot: Low Prices
 line_plots.add_trace(
     go.Scatter(
         x=utl.df.index,
@@ -51,7 +57,7 @@ line_plots.add_trace(
     row=2,
     col=1
 )
-
+## Plot: Close Prices
 line_plots.add_trace(
     go.Scatter(
         x=utl.df.index,
@@ -63,31 +69,34 @@ line_plots.add_trace(
     col=2
 )
 
-# Update xaxis properties
+## Update xaxis properties
 line_plots.update_xaxes(title_text="Date", row=1, col=1)
 line_plots.update_xaxes(title_text="Date", row=1, col=2)
 line_plots.update_xaxes(title_text="Date", row=2, col=1)
 line_plots.update_xaxes(title_text="Date", row=2, col=2)
 
-# Update yaxis properties
+## Update yaxis properties
 line_plots.update_yaxes(title_text="Open", row=1, col=1)
 line_plots.update_yaxes(title_text="High", row=1, col=2)
 line_plots.update_yaxes(title_text="Low", row=2, col=1)
 line_plots.update_yaxes(title_text="Close", row=2, col=2)
 
-# Update title and height
+## Update title and height
 line_plots.update_layout(title_text = 'Stock Data Overview', height=700)
 
-# Observations from Line Plots 2
+# Volatitlity between 2012-2013 and 2016-2017
+
+## Initializing Subplots
 line_plots2 = make_subplots(
     rows=2,
     cols=1,
     subplot_titles=('AAPL Close Price (2012-2013)', 'AAPL Close Price (2016-2017)')
 )
-
+## Filtering Data
 temp1 = utl.df['2012-01-01':'2013-12-31']
 temp2 = utl.df['2016-01-01':'2017-12-31']
 
+## Plot: AAPL Close Price (2012-2013)
 line_plots2.add_trace(
     go.Scatter(
         x=temp1.index,
@@ -98,7 +107,7 @@ line_plots2.add_trace(
     row=1,
     col=1,
 )
-
+## Plot: AAPL Close Price (2016-2017)
 line_plots2.add_trace(
     go.Scatter(
         x=temp2.index,
@@ -110,39 +119,47 @@ line_plots2.add_trace(
     col=1
 )
 
-# Update xaxis properties
+## Update xaxis properties
 line_plots2.update_xaxes(title_text="Date", row=1, col=1)
 line_plots2.update_xaxes(title_text="Date", row=2, col=1)
 
-# Update yaxis properties
+## Update yaxis properties
 line_plots2.update_yaxes(title_text="Close", row=1, col=1)
 line_plots2.update_yaxes(title_text="Close", row=2, col=1)
 
-# Update title and height
+## Update title and height
 line_plots2.update_layout(title_text = 'Volatility between 2012-2013 and 2016-2017', height = 700)
 
+# Precentage Change in Close Price
 
-# Daily Percentage Changes in closing price
+## Calculating Percentage Change
 utl.df['pct_change'] = utl.df['Close'].pct_change(periods=1) * 100
 
+## Line Plot
 pct_change = px.plot(utl.df['pct_change'], kind='line')
 pct_change.update_layout(title = 'Percentage Change in Close Price')
 pct_change.update_xaxes(title= 'Date')
 pct_change.update_yaxes(title='Percentage Change')
 
-# KDE Plot
+## KDE Plot
 kde_plot = px.hist_frame(utl.df, x='pct_change', nbins=30)
 kde_plot.update_layout(title = 'Distribution of Percentage Change in Close Price')
 kde_plot.update_xaxes(title= 'Percentage Change')
 kde_plot.update_yaxes(title='Distribution')
 
-# Pattern in Volume
+#----- EDA: Volume Plots -----#
+
+# Volume Traded over Time
+
+## Line Plot
 volume_plot = px.plot(utl.df['Volume'], kind='line')
 volume_plot.update_layout(title = 'Volume Traded over Time')
 volume_plot.update_xaxes(title= 'Date')
 volume_plot.update_yaxes(title='Volume')
 
-# Correlation in Volume
+# Correlation in Volume and Close Price
+
+## Scatter Plot
 volume_correlation = exp.scatter(
     utl.df,
     x='Volume',
@@ -151,8 +168,14 @@ volume_correlation = exp.scatter(
     labels={'Volume': 'Volume', 'Close': 'Close Price'},
 )
 
-# Close vs Adj. Close Price
+#----- EDA: Close vs Adj. Close Price -----#
+
+# AAPL Close Price vs Adj Close
+
+## Initializing Graph Object Plots
 price_plot = go.Figure()
+
+## Trace: Close Price
 price_plot.add_trace(
     go.Scatter(
         x=utl.df.index,
@@ -161,7 +184,7 @@ price_plot.add_trace(
         name='Close Price',
     )
 )
-
+## Trace: Adj. Close
 price_plot.add_trace(
     go.Scatter(
         x=utl.df.index,
@@ -171,21 +194,27 @@ price_plot.add_trace(
     )
 )
 
-# Update axes titles
+## Update axes titles
 price_plot.update_xaxes(title='Date')
 price_plot.update_yaxes(title='Price')
 
-# Update title
+## Update title
 price_plot.update_layout(title_text = 'AAPL Close Price vs Adj Close')
 
 
-# Significant Adjustments
+#----- EDA: Significant Adjustments -----#
+
+# Comparision of Close and Adj. Prices
+
+## Initializing Subplots
 diff_in_prices = make_subplots(
     rows=2,
     cols=1,
-    subplot_titles=('"Close" vs "Adj. Close"', 'Difference between Close and Adj Close')
+    subplot_titles=('Close vs Adj. Close', 'Difference between Close and Adj Close')
 )
+## Plot: Close vs Adj.Close
 
+### Trace: Close Prices
 diff_in_prices.add_trace(
     go.Scatter(
         x=utl.df.index,
@@ -196,7 +225,7 @@ diff_in_prices.add_trace(
     row=1,
     col=1,
 )
-
+### Trace: Adj Close Prices
 diff_in_prices.add_trace(
     go.Scatter(
         x=utl.df.index,
@@ -208,8 +237,12 @@ diff_in_prices.add_trace(
     col=1,
 )
 
+## Plot: Difference between Close and Adj Close
+
+### Calculating Difference in Close between Adj Close
 temp3 = utl.df['Close'] - utl.df['Adj Close']
 
+### Plot: Difference
 diff_in_prices.add_trace(
     go.Scatter(
         x=utl.df.index,
@@ -221,71 +254,83 @@ diff_in_prices.add_trace(
     col=1
 )
 
-# Update xaxis properties
+## Update xaxis properties
 diff_in_prices.update_xaxes(title_text="Date", row=1, col=1)
 diff_in_prices.update_xaxes(title_text="Date", row=2, col=1)
 
-# Update yaxis properties
+## Update yaxis properties
 diff_in_prices.update_yaxes(title_text="Close", row=1, col=1)
 diff_in_prices.update_yaxes(title_text="Difference", row=2, col=1)
 
-# Update title and height
+## Update title and height
 diff_in_prices.update_layout(title_text = 'Comparision of Close and Adj. Prices', height = 700)
 
-# Decomposition Plots
+#----- EDA: Decomposition of Timeseries -----#
+
+# Calculating Decompositions
 decompositions = seasonal_decompose(utl.df['Close'], model='additive', period=365)
 
-# Decomposition: Trend
+# Plot: Trend
 trend = exp.line(decompositions.trend)
 
-# Update xaxis properties
+## Update xaxis properties
 trend.update_xaxes(title_text = 'Date')
 trend.update_yaxes(title_text='Price')
 
-# Update title
+## Update title
 trend.update_layout(title_text='Trend')
 
-# Decomposition: Seasonality
+# Plot: Seasonality
 seasonality = exp.line(decompositions.seasonal)
 
-# Update xaxis properties
+## Update xaxis properties
 seasonality.update_xaxes(title_text = 'Date')
 
-# Update Title
+## Update Title
 seasonality.update_layout(title_text='Seasonality')
 
-# Decomposition: Cyclic Variations
+# Plot: Cyclic Variations
+
+## Calculating Cyclic Variations
 cyclic_variation = decompositions.trend - decompositions.trend.rolling(window=365, center=True).mean() # pylint: disable=line-too-long
 
+## Line Plot
 cyclic = exp.line(cyclic_variation)
 
-# Update xaxis properties
+## Update xaxis properties
 cyclic.update_xaxes(title_text = 'Date')
 
-# Update Title
+## Update Title
 cyclic.update_layout(title_text='Cyclic Variations')
 
-# Decomposition: Residuals/Noise
+# Plot: Residuals/Noise
 residuals = exp.line(decompositions.resid)
 
-# Update xaxis properties
+## Update xaxis properties
 residuals.update_xaxes(title_text = 'Date')
 
-# Update Title
+## Update Title
 residuals.update_layout(title_text='Residuals (Noise)')
+
+#----- ARIMA: ACF and PACF Plots -----#
 
 def autocorrelation_plot(series, plot_pacf=False, alpha=0.05):
     ''' Creates an ACF or PACF plot '''
+
+    # Toggle to plot ACF or PACF
     if plot_pacf:
         corr_array = pacf(series['Close'].diff().dropna(), alpha=alpha)
     else:
         corr_array = acf(series['Close'].diff().dropna(), alpha=alpha)
 
+    # Filtering required data
     lower_y = corr_array[1][:,0] - corr_array[0]
     upper_y = corr_array[1][:,1] - corr_array[0]
 
+    # Initializing Graph Objects Plot
     fig = go.Figure()
 
+    # Plotting Lines using Loop
     for x in range(len(corr_array[0])):
         fig.add_scatter(
             x=(x,x),
@@ -294,6 +339,7 @@ def autocorrelation_plot(series, plot_pacf=False, alpha=0.05):
             line_color='#3f3f3f'
             )
 
+    # Plotting Markers
     fig.add_scatter(
         x=np.arange(len(corr_array[0])),
         y=corr_array[0],
@@ -302,6 +348,7 @@ def autocorrelation_plot(series, plot_pacf=False, alpha=0.05):
         marker_size=12
         )
 
+    # Creating Lag Plot Area: Positive Scale
     fig.add_scatter(
         x=np.arange(len(corr_array[0])),
         y=upper_y,
@@ -309,6 +356,7 @@ def autocorrelation_plot(series, plot_pacf=False, alpha=0.05):
         line_color='rgba(255,255,255,0)'
         )
 
+    # Creating Lag Plot Area: Negative Scale
     fig.add_scatter(
         x=np.arange(len(corr_array[0])),
         y=lower_y,
@@ -322,18 +370,26 @@ def autocorrelation_plot(series, plot_pacf=False, alpha=0.05):
     fig.update_xaxes(range=[-1,42])
     fig.update_yaxes(zerolinecolor='#000000')
 
+    # Updating Title based on Toggle Value
     if plot_pacf:
         title = 'Partial Autocorrelation (PACF)'
     else:
         title = 'Autocorrelation (ACF)'
 
+    # Plot Title
     fig.update_layout(title=title)
 
     return fig
 
+#----- Model Evaluation Plot (Train, Test & Forecast) -----#
+
 def model_visulization(train, test, forecast):
-    ''' Model Evaluation using RMSE and Residuals '''
+    ''' Model Evaluation using Train, Test & Forecasted Values '''
+
+    # Initializing Graph Objects Plot
     fig = go.Figure()
+
+    # Plot: Train Data
     fig.add_trace(
         go.Scatter(
             x=train.index,
@@ -342,7 +398,7 @@ def model_visulization(train, test, forecast):
             name='Train'
         )
     )
-
+    # Plot: Test Data
     fig.add_trace(
         go.Scatter(
             x=test.index,
@@ -351,7 +407,7 @@ def model_visulization(train, test, forecast):
             name='Test'
         )
     )
-
+    # Plot: Forecast Data
     fig.add_trace(
         go.Scatter(
             x=forecast.index,
@@ -368,11 +424,18 @@ def model_visulization(train, test, forecast):
 
     # Update title
     fig.update_layout(title_text = 'Model Evaluation')
+
     return fig
 
+#----- Model Forecast -----#
+
 def final_forecast(forecast, train=utl.df):
-    ''' Visulizes the Forecasted Data  '''
+    ''' Visulizes the Forecasted Data '''
+
+    # Initializing Graph Objects Plot
     fig = go.Figure()
+
+    # Plot: Original Data
     fig.add_trace(
         go.Scatter(
             x=train.index,
@@ -381,7 +444,7 @@ def final_forecast(forecast, train=utl.df):
             name='Original Data'
         )
     )
-
+    # Plot: Forecasted Values
     fig.add_trace(
         go.Scatter(
             x=forecast.index,
@@ -398,4 +461,5 @@ def final_forecast(forecast, train=utl.df):
 
     # Update title
     fig.update_layout(title_text = 'Forecast')
+
     return fig
