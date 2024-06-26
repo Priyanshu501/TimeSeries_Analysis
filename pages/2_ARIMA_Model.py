@@ -20,6 +20,9 @@ if 'q' not in session_state:
 if 'forecast_days' not in session_state:
     session_state.forecast_days = 30
 
+if 'fit_model' not in session_state:
+    session_state.fit_model = False
+
 #----- Sidebar Configuration -----#
 st.sidebar.title('ARIMA Model Implementation')
 st.sidebar.markdown('''
@@ -191,6 +194,9 @@ session_state.q = st.number_input('Enter value for q:', min_value=0, value=7)
 
 # Fitting Model
 if st.button('Fit Model: ARIMA'):
+    session_state.fit_model = True
+
+if session_state.fit_model:
     train, test, forecast = utl.arima_fit_model(
         utl.df,
         p=session_state.p,
