@@ -29,3 +29,7 @@ A thorough exploration of historical stock prices, examining trends, seasonality
 * **LSTM (Long Short-Term Memory)**: A type of recurrent neural network (RNN) well-suited for sequential data.
 
 * **GRU (Gated Recurrent Unit)**: Another RNN variant that is simpler and faster than LSTM.
+
+## Summary
+
+This project integrates both traditional statistical techniques and advanced deep learning models to forecast AAPL stock prices, providing a detailed and multifaceted approach. By leveraging a comprehensive exploratory data analysis and implementing a variety of models, the project aims to enhance predictive accuracy and offer valuable insights into stock price movements. Each model is thoroughly documented, ensuring transparency and understanding of their application and performance in forecasting future stock prices.
